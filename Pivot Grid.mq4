@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2019, MetaQuotes Software Corp."
 #property link      "https://www.mql5.com"
-#property version   "1.00"
+#property version   "1.01"
 #property strict
 #define SIGNAL_NONE 0
 #define SIGNAL_BUY   1
@@ -43,7 +43,7 @@ void OnTick()
 int Total;
 Total = OrdersTotal (); 
 if (Volume[0] > 1) return;
- int Order = SIGNAL_NONE;
+int Order = SIGNAL_NONE;
 
 //----------------------------+
 // Sizing Risk dan Volume     |
@@ -56,8 +56,10 @@ double Lots = 1.0;
 int StopLoss = 200;
 int P = 10;
 
- if (isSizingOn == true) 
+if (isSizingOn == true) 
    {
+      // I added the variation of sizing as long balance growing
+      
       if (AccountInfoDouble(ACCOUNT_BALANCE) < 50000) Risk = 10;
       if (AccountInfoDouble(ACCOUNT_BALANCE)< 80000 && AccountInfoDouble(ACCOUNT_BALANCE)> 500000) Risk = 5;
       if (AccountInfoDouble(ACCOUNT_BALANCE)> 100000) Risk = 22;
@@ -65,12 +67,15 @@ int P = 10;
       Lots = NormalizeDouble(Lots, 2); // Round to 2 decimal place
    } 
  
-//----------------------------+
-// Expired time pending order |
-//----------------------------+
+//----------------------------------+
+// Datetime, trading only in Monday |
+//----------------------------------+
 
-datetime et1 = TimeCurrent()+(PERIOD_M1 * 60 * 60)*50;
-datetime et2 = TimeCurrent()+(PERIOD_M1 * 60 * 60)*25;
+datetime day = 
+
+// Recently do not use this part
+//datetime et1 = TimeCurrent()+(PERIOD_M1 * 60 * 60)*50;
+//datetime et2 = TimeCurrent()+(PERIOD_M1 * 60 * 60)*25;
 
 //----------------------------+
 // Filter position dari akun  |
@@ -150,16 +155,10 @@ if (B >=0.005) return;
 
 //Open Buy Stop
 if (MACDMain_a < MACDSignal_b && MACDMain_c > MACDSignal_d && MACDMain_a <=0 && MA100_5 < MA100_1 && Ask >= MA100_1 && ATRcurrent < ATRpast) int Tiket = OrderSend (Symbol(), OP_BUY, Lots,Ask,3,0,0);
-//if (Ask < Pivot      && MACD >=0) int Ticket    = OrderSend (Symbol (),OP_BUY,Lots,Ask,3,LowestD,Pivot,"PIVOT_BUY",0,et1);
-//if (Ask < Pivot      && MACD >=0) int Ticket    = OrderSend (Symbol (),OP_BUYSTOP,Lots,Pivot,3,LowestD,Pivot + 300*Point,"PIVOT_BUY",0,et1);
-//if (Ask < UpperHalf  && MACD >=0) int Ticket2   = OrderSend (Symbol (),OP_SELLLIMIT,Lots,UpperHalf,3,HighestD,Lowest,"PIVOT_BUY",0,et1);
 
 //Open Sell Stop
 if (MACDMain_a > MACDSignal_b && MACDMain_c < MACDSignal_d && MACDMain_a >=0 && MA100_5 > MA100_1 && Bid <= MA100_1 && ATRcurrent < ATRpast) int Tiket = OrderSend (Symbol(), OP_SELL, Lots,Bid,3,0,0);
 
-//if (Ask > Pivot      && MACD <=0) int Ticket    = OrderSend (Symbol (),OP_SELL,Lots,Bid,3,HighestD,Pivot,"PIVOT_BUY",0,et1);
-//if (Ask > Pivot      && MACD <=0) int Ticket    = OrderSend (Symbol (),OP_SELLSTOP,Lots,Pivot,3,HighestD,Pivot- 300*Point,"PIVOT_BUY",0,et1);
-//if (Ask > LowerHalf  && MACD <=0) int Ticket    = OrderSend (Symbol (),OP_BUYLIMIT,Lots,LowerHalf,3,LowestD,Highest,"PIVOT_BUY",0,et1);
   }
 
 //+------------------------------------------------------------------+
